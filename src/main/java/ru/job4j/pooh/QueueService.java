@@ -1,4 +1,5 @@
 package ru.job4j.pooh;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentHashMap;
