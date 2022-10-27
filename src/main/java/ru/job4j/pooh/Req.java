@@ -16,9 +16,11 @@ public class Req {
 
     public static Req of(String content) {
         String[] params = parse(content);
+/*
         for (String str : params) {
             System.out.println(str);
         }
+*/
 
         return new Req(params[0], params[1], params[2], params[3]);
     }
