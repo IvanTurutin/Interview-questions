@@ -9,11 +9,12 @@ public class QueueService implements Service {
 	private Map<String, ConcurrentLinkedQueue<String>> queue = new ConcurrentHashMap<>();
 	private static final String REQUEST_DONE = "200";
 	private static final String REQUEST_NO_DATA = "204";
+	private static final String POST = "POST";
     
 	@Override
     public Resp process(Req req) {
         Resp rslt = null;
-		if ("POST".equals(req.httpRequestType())) {
+		if (POST.equals(req.httpRequestType())) {
 			Queue<String> tmpQueue = queue.putIfAbsent(req.getSourceName(), new ConcurrentLinkedQueue<>());
 			if (tmpQueue == null) {
 				tmpQueue = queue.get(req.getSourceName());
