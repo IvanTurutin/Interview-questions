@@ -8,12 +8,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PoohServer {
     private final HashMap<String, Service> modes = new HashMap<>();
-    private static final Logger LOG = LoggerFactory.getLogger(PoohServer.class.getName());
 
     public void start() {
         modes.put("queue", new QueueService());
@@ -30,9 +27,7 @@ public class PoohServer {
                         byte[] buff = new byte[1_000_000];
                         var total = input.read(buff);
                         var content = new String(Arrays.copyOfRange(buff, 0, total), StandardCharsets.UTF_8);
-/*
                         System.out.println("content:" + System.lineSeparator() + content);
-*/
                         var req = Req.of(content);
                         var resp = modes.get(req.getPoohMode()).process(req);
                         String ls = System.lineSeparator();

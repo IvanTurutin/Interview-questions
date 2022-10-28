@@ -32,4 +32,99 @@ public class TopicServiceTest {
         assertThat(result1.text()).isEqualTo("temperature=18");
         assertThat(result2.text()).isEqualTo("");
     }
+
+    @Test
+    public void whenTwoClientsGetQueue() {
+        TopicService topicService = new TopicService();
+        String paramForPublisher = "temperature=18";
+        String paramForSubscriber1 = "client407";
+        String paramForSubscriber2 = "client6565";
+        Resp result1 = topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber1)
+        );
+        Resp result2 = topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber2)
+        );
+        assertThat(result1.text()).isEqualTo("");
+        assertThat(result2.text()).isEqualTo("");
+
+        // Режим topic. Подписываемся на топик weather. client407.
+        topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber1)
+        );
+        assertThat(result1.text()).isEqualTo("");
+
+        // Режим topic. Подписываемся на топик weather. client6565.
+        topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber2)
+        );
+        assertThat(result2.text()).isEqualTo("");
+
+        // Режим topic. Добавляем данные в топик weather.
+        topicService.process(
+                new Req("POST", "topic", "weather", paramForPublisher)
+        );
+
+        // Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client407.
+        result1 = topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber1)
+        );
+        // Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client6565.
+        result2 = topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber2)
+        );
+
+        assertThat(result1.text()).isEqualTo("temperature=18");
+        assertThat(result2.text()).isEqualTo("temperature=18");
+    }
+
+    @Test
+    public void whenTwoClientsGetDifferentQueues() {
+        TopicService topicService = new TopicService();
+        String paramForPublisher = "temperature=18";
+        String paramForPublisher2 = "temperature=20";
+        String paramForSubscriber1 = "client407";
+        String paramForSubscriber2 = "client6565";
+
+        // Режим topic. Подписываемся на топик weather. client407.
+        topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber1)
+        );
+        // Режим topic. Добавляем данные в топик weather.
+        topicService.process(
+                new Req("POST", "topic", "weather", paramForPublisher)
+        );
+
+        // Режим topic. Подписываемся на топик weather. client6565.
+        topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber2)
+        );
+
+        // Режим topic. Добавляем данные в топик weather.
+        topicService.process(
+                new Req("POST", "topic", "weather", paramForPublisher2)
+        );
+
+        // Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client407.
+        Resp result1 = topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber1)
+        );
+        // Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client6565.
+        Resp result2 = topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber2)
+        );
+
+        // Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client407.
+        result1 = topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber1)
+        );
+        // Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client6565.
+        result2 = topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber2)
+        );
+
+        assertThat(result1.text()).isEqualTo("temperature=20");
+        assertThat(result2.text()).isEqualTo("");
+
+    }
 }
