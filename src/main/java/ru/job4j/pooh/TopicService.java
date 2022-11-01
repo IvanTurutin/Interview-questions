@@ -25,24 +25,13 @@ public class TopicService implements Service {
                 rslt = new Resp("", REQUEST_NO_DATA);
             }
         } else {
-			Map<String, ConcurrentLinkedQueue<String>> tmpMapOfQueues =
-                    queue.putIfAbsent(req.getSourceName(), new ConcurrentHashMap<>());
-            if (tmpMapOfQueues == null) {
-                queue.get(req.getSourceName()).put(req.getParam(), new ConcurrentLinkedQueue<>());
-				rslt = new Resp("", REQUEST_NO_DATA);
+            queue.putIfAbsent(req.getSourceName(), new ConcurrentHashMap<>());
+            queue.get(req.getSourceName()).putIfAbsent(req.getParam(), new ConcurrentLinkedQueue<>());
+            String param = queue.get(req.getSourceName()).get(req.getParam()).poll();
+            if (param == null) {
+                rslt = new Resp("", REQUEST_NO_DATA);
             } else {
-                Queue<String> tmpUserQueue =
-                    tmpMapOfQueues.putIfAbsent(req.getParam(), new ConcurrentLinkedQueue<>());
-				if (tmpUserQueue == null) {
-					rslt = new Resp("", REQUEST_NO_DATA);
-				} else {
-					String param = tmpUserQueue.poll();
-					if (param == null) {
-						rslt = new Resp("", REQUEST_NO_DATA);
-					} else {
-						rslt = new Resp(param, REQUEST_DONE);
-					}
-				}
+                rslt = new Resp(param, REQUEST_DONE);
             }
         }
         return rslt;
