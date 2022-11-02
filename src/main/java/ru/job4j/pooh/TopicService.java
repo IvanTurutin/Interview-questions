@@ -10,6 +10,7 @@ public class TopicService implements Service {
     private static final String REQUEST_DONE = "200";
     private static final String REQUEST_NO_DATA = "204";
     private static final String POST = "POST";
+    private static final String GET = "GET";
     private static final String NOT_IMPLEMENTED = "501";
 
     @Override
@@ -25,7 +26,7 @@ public class TopicService implements Service {
             } else {
                 rslt = new Resp("", REQUEST_NO_DATA);
             }
-        } else {
+        } else if (GET.equals(req.httpRequestType())) {
             queue.putIfAbsent(req.getSourceName(), new ConcurrentHashMap<>());
             queue.get(req.getSourceName()).putIfAbsent(req.getParam(), new ConcurrentLinkedQueue<>());
             String param = queue.get(req.getSourceName()).get(req.getParam()).poll();

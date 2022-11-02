@@ -10,6 +10,7 @@ public class QueueService implements Service {
 	private static final String REQUEST_DONE = "200";
 	private static final String REQUEST_NO_DATA = "204";
 	private static final String POST = "POST";
+	private static final String GET = "GET";
 	private static final String NOT_IMPLEMENTED = "501";
 
 	@Override
@@ -19,7 +20,7 @@ public class QueueService implements Service {
 			queue.putIfAbsent(req.getSourceName(), new ConcurrentLinkedQueue<>());
 			queue.get(req.getSourceName()).add(req.getParam());
 			rslt = new Resp(req.getParam(), REQUEST_DONE);
-		} else {
+		} else if (GET.equals(req.httpRequestType())) {
 			String param = queue.getOrDefault(req.getSourceName(), new ConcurrentLinkedQueue<>()).poll();
 			if (param == null) {
 				rslt = new Resp("", REQUEST_NO_DATA);
