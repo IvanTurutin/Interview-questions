@@ -10,10 +10,11 @@ public class QueueService implements Service {
 	private static final String REQUEST_DONE = "200";
 	private static final String REQUEST_NO_DATA = "204";
 	private static final String POST = "POST";
+	private static final String NOT_IMPLEMENTED = "501";
 
 	@Override
 	public Resp process(Req req) {
-		Resp rslt;
+		Resp rslt = new Resp("", NOT_IMPLEMENTED);
 		if (POST.equals(req.httpRequestType())) {
 			queue.putIfAbsent(req.getSourceName(), new ConcurrentLinkedQueue<>());
 			queue.get(req.getSourceName()).add(req.getParam());
